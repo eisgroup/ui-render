@@ -5,10 +5,12 @@
  * It was part of `engine/utils.ts` until §9.9-H6, which dissolved that file into `formData.ts`,
  * `errorMapping.ts` and `dataMapping.ts`.
  */
+import { getIn, setIn } from 'final-form'
 import type { FormApi } from 'final-form'
-import { get, merge, isEqual, isObject, hasObjectValue, set, unset } from '../utils/object'
+import { get, merge, isEqual, isObject, hasObjectValue, set } from '../utils/object'
 import type { RegisteredForm } from '../state/formRegistry'
 import { FIELD } from '../modules'
+import { fieldNamesOf } from '../modules/form/batchedForm'
 import { cloneDeep } from '../utils'
 
 /** A meta node, as far as these helpers read it. */
@@ -64,10 +66,11 @@ export type ValidatingForm = {
 const lastMerges = new WeakMap<unknown[], Map<string, { arrays: unknown[][], owned: Owned[], rows: object[] }>>()
 
 /**
- * What a table row with a form of its own holds of an array, and what it started from: its row, at `index`, or the
- * array itself, when the array is inside its row.
+ * A table row with a form of its own, as a merge of an array reads it: its place, its values, what they hold of the
+ * array (`held`: its row of it, or the array, when the array is inside its row), which changes with any of them, and
+ * its fields.
  */
-type Owned = { index?: number, values: unknown, initial: unknown }
+type Owned = { place: string, values: Values, held: unknown, fields: readonly string[] }
 
 /**
  * Whether two form objects are one final-form instance. react-final-form hands a new `{...form, reset}`
@@ -96,70 +99,47 @@ export function rowPlaceOf (meta: MetaNode | undefined): string | undefined {
 /** A path in dots: `dataKind.phases[0].dataKind.items` and `dataKind.phases.0.dataKind.items` name one place. */
 const dotted = (path: string) => path.replace(/\[(\d+)\]/g, '.$1')
 
+/** How deep a place is: how many steps its path has. */
+const depthOf = (place: string) => dotted(place).split('.').length
+
 /** Whether `piece` is a row: an object, and not an array. */
 const isRow = (piece: unknown): piece is object => piece != null && typeof piece === 'object' && !Array.isArray(piece)
 
-/** A step of a path in values: a key of an object, or an index of an array. */
-type Step = string | number
+/** `value`, or, where it is an object or an array, a copy of it: what a merge gives shares nothing with a form's state. */
+const copyOf = (value: unknown) => value !== null && typeof value === 'object' ? cloneDeep(value) : value
 
 /**
- * Something a form changed of the values it started from, at `path`: the value there now, no value there any more
- * (`removed`), or, at an array's `length`, an array made shorter.
+ * The fields of a table row's own form, by name: every one it has registered (`fieldNamesOf`), the ones that have gone
+ * included, or, for a form `createBatchedForm` did not make, the ones it registers now.
  */
-export type Change = { path: Step[], value?: unknown, removed?: true }
+function fieldsOf (form: FormApi): readonly string[] {
+  return fieldNamesOf(form) || (typeof form.getRegisteredFields === 'function' ? form.getRegisteredFields() : [])
+}
 
-/**
- * What `current` changed of `initial`, each change at its path, in objects and arrays; none for what stayed. A table
- * row's own form starts from the row's values, so this is what the row's fields changed of it.
- *
- * A value `current` no longer holds is a change too (2026-10-26): final-form drops a value set to `undefined`, as a
- * field with `normalize: 'date'` sets it when it is cleared, and the document's copy showed the value it had again.
- */
-export function changesOf (initial: unknown, current: unknown, path: Step[] = [], changes: Change[] = []): Change[] {
-  if (Object.is(initial, current)) return changes
-  if (current === undefined) {
-    // A row its form does not hold at all is no change to the row: the form holds a row only at its place.
-    if (path.length) changes.push({ path, removed: true })
-  } else if (isObject(current) && isObject(initial)) {
-    Object.keys(current).forEach(key => changesOf(initial[key], current[key], [...path, key], changes))
-    Object.keys(initial).forEach(key => {
-      if (!(key in current) && initial[key] !== undefined) changes.push({ path: [...path, key], removed: true })
-    })
-  } else if (Array.isArray(current) && Array.isArray(initial)) {
-    for (let index = 0; index < current.length; index++) changesOf(initial[index], current[index], [...path, index], changes)
-    if (current.length < initial.length) changes.push({ path: [...path, 'length'], value: current.length })
-  } else if (!isEqual(initial, current)) {
-    changes.push({ path, value: current })
-  }
-  return changes
+/** The names of `fields` inside `place`, in dots: those of a row's own form inside its row. */
+function namesInside (fields: readonly string[], place: string): string[] {
+  const inside = `${dotted(place)}.`
+  return fields.map(dotted).filter(name => name.startsWith(inside))
 }
 
 /**
- * Writes `changes` into `target`, under `at`, where `target` is the caller's own copy: a value copied, a value no longer
- * held deleted, and an array cut to its length. A whole row or array its form had no start for is merged over what is
- * there, as every row form's values were before they had one.
+ * `target` with `value` written at `at`, a path inside it, as final-form writes a field's value into a form's values
+ * (`setIn`): each object on the way copied, so the target is changed only where it is a copy of its own. `undefined`,
+ * the value of a field its form no longer holds, as a cleared date leaves it, takes the value at `at` away, and each
+ * object that leaves empty, but the target, which stays an empty row. Where nothing is there, nothing changes: a value
+ * set to `undefined` there would make a row of nothing. A target that has another shape at `at`, an index into an
+ * object or a key of an array, which final-form throws for, is left as it is.
  */
-function applyChanges (target: object, at: Step[], changes: Change[]): void {
-  changes.forEach(({ path, value, removed }) => {
-    const to = [...at, ...path]
-    if (removed) {
-      unset(target, to)
-    } else if (path[path.length - 1] === 'length') {
-      const array = get(target, to.slice(0, -1))
-      if (Array.isArray(array) && array.length > Number(value)) array.length = Number(value)
-    } else {
-      const there = path.length ? undefined : get(target, to)
-      set(target, to, isObject(there) && isObject(value) ? merge(there, value) : cloneDeep(value))
+function writeField (target: unknown, at: string, value: unknown): unknown {
+  try {
+    if (value === undefined) {
+      if (getIn(target as object, at) === undefined) return target
+      return setIn(target as object, at, undefined) || {}
     }
-  })
-}
-
-/** Whether a change of the rows of an array, by their index, leaves them rows among the first `cap`: a row, not a value. */
-function keepsRows ({ path, value, removed }: Change, cap: number): boolean {
-  const [first] = path
-  if (first === 'length') return true
-  if (typeof first !== 'number' || first >= cap) return false
-  return path.length > 1 || (!removed && isRow(value))
+    return setIn(target !== null && typeof target === 'object' ? target : {}, at, copyOf(value))
+  } catch (anotherShape) {
+    return target
+  }
 }
 
 /**
@@ -168,11 +148,13 @@ function keepsRows ({ path, value, removed }: Change, cap: number): boolean {
  * Length is capped to the minimum array length among those forms so a stale longer copy on the
  * master form does not leave ghost rows after FieldArray.remove (lodash merge keeps trailing indices).
  *
- * A table row with a form of its own (`rowPlaceOf`) gives what it changed of what it started from (`changesOf`),
- * written over the documents' copy and counted in no cap, as `mergeForms` takes it (2026-10-26):
- * - for a row of this array, what it changed of that row;
- * - for an array inside its row, a table nested in it, what it changed of that array, row by row;
- * - for an array elsewhere, nothing.
+ * A table row with a form of its own (`rowPlaceOf`) gives the values of its fields, and nothing else, each written at
+ * its name over the documents' rows and counted in no cap, as `mergeForms` takes them (2026-10-27):
+ * - a field of a row of this array, in that row;
+ * - a field inside this array, where the array is inside its row, in that row of the array; and a field that holds
+ *   the array, as a table's does (`FieldArray`), as the rows;
+ * - a field elsewhere, nowhere.
+ * Shallowest place first: a row with a form of its own inside another such row writes after it.
  *
  * A `useForm` row's form held the array up to its own index once the row was edited, so the cap dropped the rows after
  * it, and the document's copy, merged after it, took its edit back: a submit sent what was left. Since its form starts
@@ -203,14 +185,9 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms, validati
     }
     const own = dotted(rowMeta!.relativePath!) === at // not undefined: `rowPlaceOf` read both
     if (!own && !at.startsWith(`${dotted(place)}.`)) return
-    // A row's form has a field or two: its state, for what it started from, is cheap.
-    const state = form.getState()
-    const where = own ? place : path
-    owned.push({
-      index: own ? Number(rowMeta!.relativeIndex) : undefined,
-      values: get(handed ? validating!.values : state.values, where),
-      initial: get(state.initialValues, where),
-    })
+    // A row's form has a field or two: its state is cheap.
+    const values = handed ? validating!.values : form.getState().values
+    owned.push({ place, values, held: getIn(values, own ? place : path), fields: fieldsOf(form) })
   })
   if (!arrays.length) {
     return []
@@ -220,12 +197,29 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms, validati
   if (
     last && last.arrays.length === arrays.length && last.arrays.every((array, i) => array === arrays[i]) &&
     last.owned.length === owned.length &&
-    last.owned.every((was, i) => was.index === owned[i].index && was.values === owned[i].values && was.initial === owned[i].initial)
+    last.owned.every((was, i) => was.place === owned[i].place && was.held === owned[i].held && sameNames(was.fields, owned[i].fields))
   ) {
     return last.rows.slice()
   }
+  const rows = mergeRows(at, arrays, owned)
+  const byPath = kept || new Map()
+  byPath.set(path, { arrays, owned, rows })
+  if (!kept) lastMerges.set(arrays[0], byPath)
+  return rows.slice()
+}
+
+/** Whether two lists of names are the same names, in the same order. */
+function sameNames (a: readonly string[], b: readonly string[]): boolean {
+  return a === b || (a.length === b.length && a.every((name, i) => name === b[i]))
+}
+
+/**
+ * The rows of the array at `at`, a path in dots: the documents' `arrays` merged row by row, up to the shortest, and the
+ * fields of the rows with a form of their own written over them (`getLiveMergedDataKindArray`).
+ */
+function mergeRows (at: string, arrays: unknown[][], owned: Owned[]): object[] {
   const cap = Math.min(...arrays.map(a => a.length))
-  const out: object[] = []
+  let rows: object[] = []
   for (let i = 0; i < cap; i++) {
     let row: object = {}
     for (const arr of arrays) {
@@ -234,23 +228,30 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms, validati
         row = { ...row, ...piece }
       }
     }
-    out.push(hasObjectValue(row) ? row : {})
+    rows.push(hasObjectValue(row) ? row : {})
   }
-  // Written over a copy: the rows hold the objects of the documents' values.
-  const changed = owned.map(({ index, values, initial }) => ({ index, changes: changesOf(initial, values) }))
-    .filter(({ changes }) => changes.length > 0)
-  const rows = { all: changed.length ? cloneDeep(out) : out }
-  changed.forEach(({ index, changes }) => {
-    if (index === undefined) {
-      applyChanges(rows, ['all'], changes.filter(change => keepsRows(change, cap)))
-    } else if (index < cap) {
-      applyChanges(rows, ['all', index], changes.filter(({ path, value, removed }) => path.length > 0 || (!removed && isRow(value))))
-    }
+  // Each row is replaced, not changed: the rows hold the objects of the documents' values.
+  const inside = `${at}.`
+  owned.slice().sort((a, b) => depthOf(a.place) - depthOf(b.place)).forEach(({ place, values, fields }) => {
+    namesInside(fields, place).forEach(name => {
+      const value = getIn(values, name)
+      // A field that holds the array: its rows are the rows.
+      if (name === at) {
+        rows = Array.isArray(value) ? value.map(row => isRow(row) ? copyOf(row) as object : {}) : []
+        return
+      }
+      if (!name.startsWith(inside)) return
+      const rest = name.slice(inside.length)
+      const dot = rest.indexOf('.')
+      const index = Number(dot === -1 ? rest : rest.slice(0, dot))
+      // A row past the documents' rows is one just removed there.
+      if (!Number.isInteger(index) || index < 0 || index >= rows.length) return
+      rows[index] = dot === -1
+        ? (isRow(value) ? copyOf(value) as object : {})
+        : writeField(rows[index], rest.slice(dot + 1), value) as object
+    })
   })
-  const byPath = kept || new Map()
-  byPath.set(path, { arrays, owned, rows: rows.all })
-  if (!kept) lastMerges.set(arrays[0], byPath)
-  return rows.all.slice()
+  return rows
 }
 
 /**
@@ -259,6 +260,18 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms, validati
  */
 export const getRawFormsData = (forms: Forms) => {
   return mergeForms(forms, values => values);
+}
+
+/**
+ * Whether `merged`, a merge `getRawFormsData` gave, holds at each of `names` inside `place` what the table row's own
+ * `form` holds there: a merge that read those names too would write over it what it holds already, and come out the
+ * same. How a kept merge is checked for the names that came to a row's form after it (`keptRawFormsData`).
+ */
+export function holdsFields (merged: Values | undefined, form: FormApi, place: string, names: readonly string[]): boolean {
+  const inside = namesInside(names, place)
+  if (!inside.length) return true
+  const { values } = form.getState()
+  return inside.every(name => isEqual(getIn(values, name), getIn(merged || {}, name)))
 }
 
 /**
@@ -272,16 +285,24 @@ export const getRawFormsData = (forms: Forms) => {
  * `dataKind.periods[1].dataKind.periods[1]`. Measured: a `showIf` in the add row never saw the row's own
  * fields, and an edit in a `useForm` row put a copy of the table inside that row in `getFormData`.
  *
- * - Only what the form changed of the row is taken (`changesOf`), and only that is copied. A `useForm` row's
- *   form starts from the row's values there (`engine/Data.tsx`): what its fields leave alone is the document's,
- *   which another form may have edited, such as a field in the row's expanded content (2026-10-26). An add
- *   row's starts from the `initialValues` its meta declares, at the root of its values, where none of its
- *   fields reads, so all it holds at the row is what its user typed.
+ * - Only the values of the form's fields are taken (2026-10-27), each read in its values by the field's name and
+ *   written at that name over the document's copy of the row (`writeField`), a value cleared there taken away; the
+ *   rest of the row is the document's. A `useForm` row's form starts from the row's values there (`engine/Data.tsx`),
+ *   and what its fields leave alone, another form may have edited, such as a field in the row's expanded content. Its
+ *   fields are every one it has registered (`fieldNamesOf`), a field a `showIf` has hidden included: final-form keeps
+ *   its value, as the document's form keeps a hidden field's. A field that holds an array, as a table's does
+ *   (`FieldArray`), is written whole. An add row's form starts from the `initialValues` its meta declares, at the root
+ *   of its values, where none of its fields reads, so all it holds at the row is what its user typed.
+ * - From 2026-10-26 what the form changed of the row it started from was taken instead, which review found wrong: a
+ *   field named `length` was taken for an array's length, an object the row did not start with was written whole,
+ *   over a field another form had added to it, and a cleared field took away the object it left empty in the row's
+ *   form, with a field another form held in it.
  * - The row goes into the document's own containers. In containers of its own, the row of a table nested
  *   in a row (`dataKind.phases.0.dataKind.lineItems[2]`) made `phases` an object, which the merge put in
  *   place of the document's array of phases.
- * - The rows go last. Forms register as they mount, children first, and `mergeData` finds no master in a
- *   document with one key at its root, so the document's copy of an edited row came last and won.
+ * - The rows go last, shallowest first. Forms register as they mount, children first, and `mergeData` finds no
+ *   master in a document with one key at its root, so the document's copy of an edited row came last and won. A row
+ *   with a form of its own inside another such row goes after it, whose form may hold the array the row is in.
  *
  * @param {Map} forms - the forms to merge, `formsOf` or `dataFormsOf` a document tree
  * @param {Function} fromRoot - what a form that holds the document from its root contributes of its values
@@ -289,7 +310,7 @@ export const getRawFormsData = (forms: Forms) => {
  */
 function mergeForms (forms: Forms, fromRoot: (values: Values, meta: MetaNode | undefined) => Values) {
   const documents: Values[] = [];
-  const rows: Array<{ place: string, changes: Change[] }> = [];
+  const rows: Array<{ place: string, names: string[], values: Values }> = [];
 
   forms.forEach(value => {
     const { form } = value;
@@ -301,22 +322,22 @@ function mergeForms (forms: Forms, fromRoot: (values: Values, meta: MetaNode | u
       documents.push(fromRoot(cloneDeep(form.getState().values), meta));
       return;
     }
-    // Its fields are named `${place}.${name}` (`mapper.tsx`). What it changed of the row only (`changesOf`): a `useForm`
-    // row's form starts from the whole row, and an array up to its index, which a copy would walk hole by hole.
-    const { values, initialValues } = form.getState();
-    const changes = changesOf(get(initialValues, place), get(values, place));
-    if (changes.length) rows.push({ place, changes });
+    // Its fields are named `${place}.${name}` (`mapper.tsx`). Only those: a `useForm` row's form starts from the whole
+    // row, and an array up to its index, which a copy would walk hole by hole.
+    const names = namesInside(fieldsOf(form), place);
+    if (names.length) rows.push({ place, names, values: form.getState().values });
   })
 
   const merged = mergeData(documents);
   if (!rows.length) return merged;
-  // Written in place, which changes no form: each form's values were cloned before they were merged, and what a change
-  // writes is copied.
+  // Each row is set in place, which changes no form: each form's values were cloned before they were merged, and
+  // `writeField` copies what it writes into.
   const result: Values = merged || {};
-  rows.forEach(({ place, changes }) => {
-    const at = { row: get(result, place) };
-    applyChanges(at, ['row'], changes);
-    if (at.row !== undefined) set(result, place, at.row);
+  rows.sort((a, b) => depthOf(a.place) - depthOf(b.place)).forEach(({ place, names, values }) => {
+    const row = get(result, place);
+    const from = dotted(place).length + 1;
+    const written = names.reduce((target: unknown, name) => writeField(target, name.slice(from), getIn(values, name)), row);
+    if (written !== row) set(result, place, written);
   });
   return result;
 }

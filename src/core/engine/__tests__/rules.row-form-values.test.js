@@ -569,3 +569,91 @@ describe('a `useForm` block in a cell of a table\'s `extraItems`', () => {
         expect(field('extraNote')).toBeInTheDocument()
     })
 })
+
+// From 2026-10-27 a `useForm` row's form gives every merge the values of its fields, each read and written at the
+// field's name, and nothing else (`engine/formData.ts`). From 2026-10-26 it gave what it changed of the row it started
+// from, which review found wrong three ways: a field named `length` was taken for an array's length, an object the row
+// did not start with was written whole, over a field the expanded content had added to it, and a cleared field took
+// away the whole object it left empty in the row's form, with a field the expanded content held in it. 0.35.0 had the
+// first two right for `getFormData` and a `showIf`. Each case runs for rows with forms of their own and for rows that
+// share the document's form, which give the same.
+describe.each([['`useForm` rows', true], ['rows sharing the document\'s form', false]])('a table of %s', (_, useForm) => {
+    /** A table of `items` whose cells are `cells`, and whose expanded content is `expanded`, with a Submit button. */
+    const tableOf = (cells, expanded) => ({
+        view: 'Col',
+        items: [{
+            view: 'Table',
+            name: 'dataKind.items',
+            headers: [{ id: 'kind', label: 'Kind' }],
+            ...expanded && { itemsExpanded: true, renderItem: { view: 'Col', items: expanded } },
+            renderItemCells: { view: 'Data', kind: 'items', embedded: true, useForm, meta: { view: 'TableCells', items: cells } },
+        }, { view: 'Button', children: 'Submit', onClick: 'submit' }],
+    })
+
+    it('has an edit of a field named `length` in getFormData, a `showIf` and a submit', async () => {
+        const meta = tableOf([
+            { view: 'Input', name: 'kind', type: 'text' },
+            { view: 'Input', name: 'length', type: 'text' },
+            { view: 'Text', children: 'Long', showIf: { name: 'length', equal: '5' } },
+        ])
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'a', length: '3' }] } })
+        const edited = { dataKind: { items: [{ kind: 'a', length: '5' }] } }
+
+        type('dataKind.items[0].length', '5')
+
+        expect(host.reader()).toEqual(edited)
+        expect(screen.queryByText('Long')).toBeInTheDocument()
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+
+    it('keeps a field the expanded content adds to an object beside one typed in the cells', async () => {
+        // The row starts with no `address`.
+        const meta = tableOf(
+            [{ view: 'Input', name: 'kind', type: 'text' }, { view: 'Input', name: 'address.city', type: 'text' }],
+            [{ view: 'Input', name: 'address.zip', type: 'text' }],
+        )
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'a' }] } })
+        const edited = { dataKind: { items: [{ kind: 'a', address: { zip: '123', city: 'X' } }] } }
+
+        type('dataKind.items[0].address.zip', '123')
+        type('dataKind.items[0].address.city', 'X')
+
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+
+    it('keeps a field the expanded content holds in an object whose date the cells clear', async () => {
+        const meta = tableOf(
+            [{ view: 'Input', name: 'kind', type: 'text' }, { view: 'Input', name: 'period.start', type: 'text', normalize: 'date' }],
+            [{ view: 'Input', name: 'period.end', type: 'text' }],
+        )
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'a', period: { start: '2020-01-01' } }] } })
+        const edited = { dataKind: { items: [{ kind: 'a', period: { end: '2020-12-31' } }] } }
+
+        type('dataKind.items[0].period.end', '2020-12-31')
+        type('dataKind.items[0].period.start', '')
+
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+
+    it('keeps the edit of a field that a `showIf` in the cells then hides, as final-form keeps its value', async () => {
+        const meta = tableOf([
+            { view: 'Input', name: 'kind', type: 'text' },
+            { view: 'Input', name: 'detail', type: 'text', showIf: { name: 'kind', equal: 'other' } },
+        ])
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'other', detail: 'as loaded' }] } })
+        const edited = { dataKind: { items: [{ kind: 'plain', detail: 'edited' }] } }
+
+        type('dataKind.items[0].detail', 'edited')
+        type('dataKind.items[0].kind', 'plain')
+
+        expect(field('dataKind.items[0].detail')).not.toBeInTheDocument()
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+})
