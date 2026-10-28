@@ -14,9 +14,17 @@
   document's copy of the row. A change is measured from what the document's form holds of the row, so an edit set
   back after a submit is one too. The rest of the row stays as the document has it, so an edit made in the row's
   expanded content, or in a table there, is kept, of a field the row's cells show as well. A submit sends the edits of
-  such a row in a table in another table's expanded content too, which 0.35.0 sent as they were. An Add or a Remove
-  still loses what was typed in the cells of a row whose data it changes, such as a row whose expanded table gains or
-  loses a line, or the rows after a removed one, which move up a row: they start again from the document's copy.
+  such a row in a table in another table's expanded content too, which 0.35.0 sent as they were.
+- **An Add or a Remove keeps what was typed in the cells of a table row that `useForm` gives a form of its own.** Both
+  rebuild the document's data from its form, which held none of what such a row's cells hold, and a row whose data
+  that changed started again from the document's copy: a row whose expanded table gained or lost a line, a row whose
+  expanded content had an edit, and every row after a removed one, which moves up a row. An empty (`null`) row, and a
+  row whose cells read the document (`relativeData: false`), whose forms start from the whole document, lost theirs on
+  any Add or Remove. The values of the fields each such row's form changed are now written into the document's form
+  before a row is added or removed, so the rebuilt data holds them, and such a row starts again from it with its
+  edits, as the document's form does. A row the Add or the Remove leaves where it was, and as it was, keeps its form
+  as it was: its edits, its touched fields, and the errors it shows and the host is told of. A row that shares the
+  document's form kept its edits, and still does.
 - **An edit in a `useForm` block that holds the whole document is in what the document reads.** A `Data` view with
   `useForm` whose `name` or `data` selects no values starts its form from the document's values, and the document's
   own form holds them too. An edit made in such a block of a value the document had was missing from `getFormData`, a

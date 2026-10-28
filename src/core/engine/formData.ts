@@ -7,7 +7,7 @@
  */
 import { getIn, setIn } from 'final-form'
 import type { FormApi, FormState } from 'final-form'
-import { get, merge, isEqual, isObject, hasObjectValue, set } from '../utils/object'
+import { get, merge, isEqual, isEqualJSON, isObject, hasObjectValue, set } from '../utils/object'
 import type { RegisteredForm } from '../state/formRegistry'
 import { FIELD } from '../modules'
 import { fieldNamesOf } from '../modules/form/batchedForm'
@@ -443,6 +443,130 @@ function mergeRows (at: string, arrays: unknown[][], owned: Owned[]): object[] {
     })
   })
   return rows
+}
+
+/**
+ * A row `changedRowsFor` gives: where it is, the row as it is to be written there, and, where the row may go back into
+ * the data as its form's `initialValues` hold it, that row (`initial`).
+ */
+export type ChangedRow = { place: string, row: unknown, initial?: object }
+
+/** The document's form the rows were written into, and its values once they were, as `settleWrittenRows` reads them. */
+export type WrittenForm = { form: { getState: unknown }, values: Values }
+
+/**
+ * THE ROWS WHOSE OWN FORMS HOLD WHAT `form` DOES NOT, AS `form` IS TO HOLD THEM (2026-10-27): for each table row with a
+ * form of its own, its place and the row as `form`'s values have it, with the values of the fields the row's form
+ * changed of its start (`changedInside`, `startOf`) written at their names (`writeField`), as `mergeForms` writes them,
+ * where that makes the row another. An Add and a Remove write them into the document's form before they add or remove
+ * a row there (`dataKindPush.ts`): the data they rebuild is that form's values.
+ *
+ * - Left out: a row its array in `form`'s values does not hold, as the live merge leaves it out (one just removed, or a
+ *   hole in the array a row's own form holds), a row whose place there has another shape, which final-form throws
+ *   for, and `form` itself, whose values hold its fields.
+ * - Shallowest first, each written over the rows before it, as `mergeForms` writes them: a row with a form of its own
+ *   inside another such row comes after it, and is in the outer row as given.
+ * - `initial` is the row the row's form's `initialValues` hold, where putting it back leaves that form as it is: they
+ *   hold just that row at its place, as a `useForm` row's do (`engine/Data.tsx`), `form` holds the row just so, and
+ *   each row given inside it has an `initial` too. An Add or a Remove that leaves the row where it was, and as it was,
+ *   puts it back into the data it rebuilds. A form that starts from the whole document, a `null` row's or one whose
+ *   cells read the document (`relativeData: false`), starts again from that data whatever they did to its row: its
+ *   values must be in it, and so in any row around it. Found in review: put back, an outer row took a `null` line's
+ *   value away.
+ *
+ * @param {Object} form - the form the rows are to be written into, as far as its values are read
+ * @param {Map} forms - the forms of its document tree, `dataFormsOf`
+ * @returns {Array<ChangedRow>} the rows to write, each at its place, shallowest first
+ */
+export function changedRowsFor (form: { getState: () => { values?: unknown } }, forms: Forms): ChangedRow[] {
+  const { values } = form.getState()
+  const owned: Array<{ place: string, names: string[], values: Values, initialValues: unknown }> = []
+  forms.forEach(entry => {
+    // A cast, not a guard: what a form registers as its meta is its document's meta.
+    const meta = entry.meta as MetaNode | undefined
+    const place = rowPlaceOf(meta)
+    if (!place || entry.form.getState === form.getState) return
+    const rows = get(values, meta!.relativePath!) // not undefined: `rowPlaceOf` read both
+    if (!Array.isArray(rows) || !(Number(meta!.relativeIndex) in rows)) return
+    const state = entry.form.getState()
+    const names = changedInside(fieldsOf(entry.form), place, state.values, startOf(entry.form, state.initialValues))
+    if (names.length) owned.push({ place, names, values: state.values, initialValues: state.initialValues })
+  })
+  // A cast, not a guard: the values hold the rows' arrays, read above.
+  let next = values as object
+  const changed: Array<{ place: string, initial?: object }> = []
+  owned.sort((a, b) => depthOf(a.place) - depthOf(b.place)).forEach(({ place, names, values: own, initialValues }) => {
+    const row = get(next, place)
+    const from = dotted(place).length + 1
+    const written = names.reduce((target: unknown, name) => writeField(target, name.slice(from), getIn(own, name)), row)
+    if (isEqual(written, row)) return
+    try {
+      next = setIn(next, place, written)
+    } catch (anotherShape) {
+      return
+    }
+    const initial = get(initialValues, place)
+    const placed = isObject(initial) && isEqual(get(values, place), initial) &&
+      isEqualJSON(initialValues, setIn({}, place, initial))
+    changed.push({ place, initial: placed ? initial : undefined })
+  })
+  changed.forEach(outer => {
+    const inside = `${dotted(outer.place)}.`
+    if (changed.some(({ place, initial }) => initial === undefined && dotted(place).startsWith(inside))) {
+      outer.initial = undefined
+    }
+  })
+  return changed.map(({ place, initial }) => ({ place, row: get(next, place), initial }))
+}
+
+/**
+ * WHAT AN ADD OR A REMOVE LEAVES OF THE ROWS `changedRowsFor` GAVE, ONCE IT HAS ADDED OR REMOVED ITS ROW (2026-10-27).
+ *
+ * - A row the operation left where it was, and as it was, goes back into `json` as its form started from it
+ *   (`initial`), shallowest first, so that an outer row takes the rows inside it along. Its form is handed what it
+ *   started from, and keeps what it holds as it did before: its edits, its touched fields, and the errors it shows and
+ *   tells the host. Written into the data, they started the form again from it, as one the operation moved or changed
+ *   starts.
+ * - The form of every other row written measures its changes from what the document's form held of its fields once
+ *   they were written (`restartWrittenRows`), as after a submit: the data holds its edits now. Read as they were
+ *   written, before the row was added or removed: where each row still was. Most such forms start again from the data
+ *   anyway, as their row moved or changed. One handed a moved row that reads as the one it started from does not, and
+ *   wrote its edits over that row. A row put back keeps its start, as does each row inside it: the data holds none of
+ *   their edits.
+ *
+ * @param {Object} json - the data the operation rebuilt from the document's form, which this changes
+ * @param {Array<ChangedRow>} rows - what `changedRowsFor` gave, shallowest first
+ * @param {Object} written - the document's form the rows were written into, and its values once they were
+ * @param {Map} forms - the forms of its document tree, `dataFormsOf`
+ */
+export function settleWrittenRows (json: unknown, rows: ChangedRow[], written: WrittenForm, forms: Forms): void {
+  // The places of the rows put back, each as the start of the places inside it.
+  const back: string[] = []
+  rows.forEach(({ place, row, initial }) => {
+    if (initial === undefined || !isEqualJSON(get(json, place), row)) return
+    set(json, place, cloneDeep(initial))
+    back.push(`${dotted(place)}.`)
+  })
+  const kept = new Set(rows.map(({ place }) => `${dotted(place)}.`)
+    .filter(place => !back.some(outer => place.startsWith(outer))))
+  // The rows kept written, and the forms that hold the document from its root, which `restartWrittenRows` reads: the
+  // one written as it was then.
+  const restarted = new Map<object, RegisteredForm>()
+  forms.forEach((entry, key) => {
+    // A cast, not a guard: what a form registers as its meta is its document's meta.
+    const meta = entry.meta as MetaNode | undefined
+    const place = rowPlaceOf(meta)
+    if (place) {
+      if (kept.has(`${dotted(place)}.`)) restarted.set(key, entry)
+    } else if (mergedFromTheRoot(meta)) {
+      // A cast, not a guard: `restartWrittenRows` reads this one for its values (`documentFormsOf`). It has no fields and
+      // no start, so it writes no field over the others (`mergeDocuments`) and its start never moves: the operation
+      // starts the form written again from the data it rebuilt.
+      const then = { getState: () => ({ values: written.values }) } as unknown as FormApi
+      restarted.set(key, entry.form.getState === written.form.getState ? { ...entry, form: then } : entry)
+    }
+  })
+  restartWrittenRows(restarted)
 }
 
 /**

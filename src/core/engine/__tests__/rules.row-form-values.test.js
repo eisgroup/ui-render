@@ -40,15 +40,16 @@ const headers = [{ id: 'kind', label: 'Kind' }, { id: 'detail', label: 'Detail' 
 
 /**
  * Mounts the meta on the data; the host records what `getFormData` reads, and what a submit sends, and can hand the
- * document other data.
+ * document other data. Asked to, it records the fields whose errors it is told of, each time.
  */
-function mount (meta, data) {
-    const host = { reader: null, submitted: [] }
+function mount (meta, data, { hearErrors = false } = {}) {
+    const host = { reader: null, submitted: [], errors: [] }
     const document = values => (
         <ConfigContext.Provider value={initialConfigState}>
             <AppContext.Provider value={popup}>
                 <UIRender meta={meta} data={cloneDeep(values)} initialValues={cloneDeep(values)}
                     getFormData={function (reader) { host.reader = reader }}
+                    {...hearErrors && { getValidationErrors: function (errors) { host.errors.push(Object.keys(errors)) } }}
                     onSubmit={function (submitted) { host.submitted.push(cloneDeep(submitted)) }}/>
             </AppContext.Provider>
         </ConfigContext.Provider>
@@ -71,8 +72,9 @@ const type = (name, value) => {
     fireEvent.blur(input)
 }
 
-const click = name => act(async () => {
-    fireEvent.click(screen.getByRole('button', { name }))
+/** Clicks the button `name`, the only one, or the `index`th of those of that name. */
+const click = (name, index) => act(async () => {
+    fireEvent.click(index === undefined ? screen.getByRole('button', { name }) : screen.getAllByRole('button', { name })[index])
     await new Promise(resolve => setTimeout(resolve, 0))
 })
 
@@ -888,5 +890,454 @@ describe.each([['`useForm` rows', true], ['rows sharing the document\'s form', f
         await act(async () => { await new Promise(resolve => setTimeout(resolve, 50)) })
 
         expect(host.reader()).toEqual({ dataKind: { items: [{ kind: 'b', note: '' }, { kind: 'x', note: 'n' }] } })
+    })
+})
+
+// An Add and a Remove rebuild the document's data from its form (`dataKindPush.ts`), and a `useForm` row whose data that
+// changes starts again from it (`WithForm`). Until 2026-10-27 the document's form held none of what such a row's cells
+// changed, so the row lost it: found in review, in a row whose expanded table gained or lost a line, and in a row whose
+// expanded content had an edit when a row was added. A removal lost what was typed in the rows after the removed one,
+// which move up a row. Rows that share the document's form kept theirs, and are driven the same way.
+const rowsOfBothKinds = [['have forms of their own', true], ['share the document\'s form', false]]
+
+/** Phases whose cells are a `title`, each with its lines below it, which a line's button removes and the add row adds. */
+const phasesWithLines = (phasesUseForm, linesUseForm) => ({
+    view: 'Col',
+    items: [{
+        view: 'Table',
+        name: 'dataKind.phases',
+        headers: [{ id: 'title', label: 'Phase' }],
+        itemsExpanded: true,
+        renderItemCells: {
+            view: 'Data', kind: 'phases', embedded: true, ...phasesUseForm && { useForm: true },
+            meta: { view: 'TableCells', items: [{ view: 'Input', name: 'title', type: 'text' }] },
+        },
+        renderItem: {
+            view: 'Col',
+            items: [{
+                view: 'Table',
+                name: 'dataKind.lineItems',
+                headers: [{ id: 'sku', label: 'SKU' }, { id: 'null', label: '' }],
+                renderItemCells: {
+                    view: 'Data', kind: 'lineItems', embedded: true, ...linesUseForm && { useForm: true },
+                    meta: {
+                        view: 'TableCells',
+                        items: [
+                            { view: 'Input', name: 'sku', type: 'text' },
+                            { view: 'Button', children: 'Remove line', onClick: 'removeData' },
+                        ],
+                    },
+                },
+                renderExtraItem: {
+                    view: 'Data', kind: 'lineItems', embedded: true, initialValues: {},
+                    meta: {
+                        view: 'TableCells',
+                        items: [
+                            { view: 'Input', name: 'sku', type: 'text', label: 'New SKU' },
+                            { view: 'Button', children: 'Add line', onClick: 'addData' },
+                        ],
+                    },
+                },
+            }],
+        },
+    }, { view: 'Button', children: 'Submit', onClick: 'submit' }],
+})
+
+const phases = { dataKind: { phases: [{ title: 'Design', dataKind: { lineItems: [{ sku: 'D-1' }, { sku: 'D-2' }] } }] } }
+
+describe.each(rowsOfBothKinds)('a table of lines below each row of a table whose cells %s', (_, useForm) => {
+    const meta = phasesWithLines(useForm, false)
+
+    it('keeps the title typed in a row as a line is removed from its table', async () => {
+        const { host } = mount(meta, phases)
+        const edited = { dataKind: { phases: [{ title: 'Design 2', dataKind: { lineItems: [{ sku: 'D-2' }] } }] } }
+
+        type('dataKind.phases[0].title', 'Design 2')
+        await click('Remove line', 0)
+
+        expect(field('dataKind.phases[0].title')).toHaveValue('Design 2')
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+
+    it('keeps the title typed in a row as a line is added to its table', async () => {
+        const { host } = mount(meta, phases)
+        const edited = { dataKind: { phases: [{ title: 'Design 2', dataKind: { lineItems: [{ sku: 'D-1' }, { sku: 'D-2' }, { sku: 'D-3' }] } }] } }
+
+        type('dataKind.phases[0].title', 'Design 2')
+        type('dataKind.phases.0.dataKind.lineItems[2].sku', 'D-3')
+        await click('Add line')
+
+        expect(field('dataKind.phases[0].title')).toHaveValue('Design 2')
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+})
+
+describe('a table of lines with forms of their own below each row of a table whose cells have forms of their own', () => {
+    it('keeps what was typed in the row, and in the line after a removed one, which moves up', async () => {
+        const { host } = mount(phasesWithLines(true, true), phases)
+        const edited = { dataKind: { phases: [{ title: 'Design 2', dataKind: { lineItems: [{ sku: 'D-2 edited' }] } }] } }
+
+        type('dataKind.phases[0].title', 'Design 2')
+        type('dataKind.phases.0.dataKind.lineItems[1].sku', 'D-2 edited')
+        await click('Remove line', 0)
+
+        expect(field('dataKind.phases[0].title')).toHaveValue('Design 2')
+        expect(field('dataKind.phases.0.dataKind.lineItems[0].sku')).toHaveValue('D-2 edited')
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+})
+
+describe.each(rowsOfBothKinds)('an Add and a Remove in a table whose cells %s', (_, useForm) => {
+    // Each row's cells are its `kind` and a Remove button, and its `note` shows below it, in the document's form.
+    const meta = {
+        view: 'Col',
+        items: [{
+            view: 'Table',
+            name: 'dataKind.items',
+            headers: [{ id: 'kind', label: 'Kind' }, { id: 'null', label: '' }],
+            itemsExpanded: true,
+            renderItemCells: {
+                view: 'Data', kind: 'items', embedded: true, ...useForm && { useForm: true },
+                meta: {
+                    view: 'TableCells',
+                    items: [
+                        { view: 'Input', name: 'kind', type: 'text' },
+                        { view: 'Button', children: 'Remove', onClick: 'removeData' },
+                    ],
+                },
+            },
+            renderItem: { view: 'Col', items: [{ view: 'Input', name: 'note', type: 'text' }] },
+            renderExtraItem: {
+                view: 'Data', kind: 'items', embedded: true, initialValues: {},
+                meta: {
+                    view: 'TableCells',
+                    items: [
+                        { view: 'Input', name: 'kind', type: 'text', label: 'New kind' },
+                        { view: 'Button', children: 'Add', onClick: 'addData' },
+                    ],
+                },
+            },
+        }, { view: 'Button', children: 'Submit', onClick: 'submit' }],
+    }
+
+    it('keeps what was typed in a row and below it as a row is added', async () => {
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'a', note: 'old' }] } })
+        const edited = { dataKind: { items: [{ kind: 'typed', note: 'new' }, { kind: 'b' }] } }
+
+        type('dataKind.items[0].kind', 'typed')
+        type('dataKind.items[0].note', 'new')
+        type('dataKind.items[1].kind', 'b')
+        await click('Add')
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('typed')
+        expect(field('dataKind.items[0].note')).toHaveValue('new')
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+
+    it('moves what was typed in the rows after a removed one up with them', async () => {
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'a' }, { kind: 'b' }, { kind: 'c' }] } })
+        const edited = { dataKind: { items: [{ kind: 'a-edited' }, { kind: 'c-edited' }] } }
+
+        type('dataKind.items[0].kind', 'a-edited')
+        type('dataKind.items[1].kind', 'b-edited')
+        type('dataKind.items[2].kind', 'c-edited')
+        await click('Remove', 1)
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('a-edited')
+        expect(field('dataKind.items[1].kind')).toHaveValue('c-edited')
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+
+    // The second row moves up with its edit, and the third, which reads as the second did, takes its place. A form of
+    // its own handed a row that reads as the one it started from is not started again (`WithForm`): until its start
+    // moved to what the data holds of it (`settleWrittenRows`), it wrote its edit over that row too.
+    it('keeps an edit to the row it was made in, as a row that reads the same moves into its place', async () => {
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'x' }, { kind: 'a' }, { kind: 'a' }] } })
+        const edited = { dataKind: { items: [{ kind: 'a1' }, { kind: 'a' }] } }
+
+        type('dataKind.items[1].kind', 'a1')
+        await click('Remove', 0)
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('a1')
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+
+    it('shows the rows a host hands it after an Add kept the edits in the data', async () => {
+        const { host, handOver } = mount(meta, { dataKind: { items: [{ kind: 'a', note: 'old' }] } })
+        type('dataKind.items[0].kind', 'typed')
+        type('dataKind.items[0].note', 'new')
+        type('dataKind.items[1].kind', 'b')
+        await click('Add')
+
+        handOver({ dataKind: { items: [{ kind: 'from the host', note: 'from the host' }] } })
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('from the host')
+        expect(field('dataKind.items[0].note')).toHaveValue('from the host')
+        expect(host.reader()).toEqual({ dataKind: { items: [{ kind: 'from the host', note: 'from the host' }] } })
+    })
+})
+
+// What an Add writes of a row is what the row's form changed (`changedInside`): a field its cells only show holds the
+// value the row started with, which, written, took back an edit the expanded content made of a field of the same name.
+describe.each(rowsOfBothKinds)('an Add in a table whose cells %s, one of them showing a field edited below them', (_, useForm) => {
+    it('keeps the edit below, and the one in the cells', async () => {
+        const meta = {
+            view: 'Col',
+            items: [{
+                view: 'Table',
+                name: 'dataKind.items',
+                headers: [{ id: 'kind', label: 'Kind' }, { id: 'note', label: 'Note' }],
+                itemsExpanded: true,
+                renderItemCells: {
+                    view: 'Data', kind: 'items', embedded: true, ...useForm && { useForm: true },
+                    meta: {
+                        view: 'TableCells',
+                        items: [{ view: 'Input', name: 'kind', type: 'text' }, { view: 'Input', name: 'note', type: 'text', readonly: true }],
+                    },
+                },
+                renderItem: { view: 'Col', items: [{ view: 'Input', name: 'note', type: 'text' }] },
+                renderExtraItem: {
+                    view: 'Data', kind: 'items', embedded: true, initialValues: {},
+                    meta: {
+                        view: 'TableCells',
+                        items: [
+                            { view: 'Input', name: 'kind', type: 'text', label: 'New kind' },
+                            { view: 'Button', children: 'Add', onClick: 'addData' },
+                        ],
+                    },
+                },
+            }, { view: 'Button', children: 'Submit', onClick: 'submit' }],
+        }
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'a', note: 'old' }] } })
+        const expandedNote = () => Array.from(document.querySelectorAll('[name="dataKind.items[0].note"]')).pop()
+        const edited = { dataKind: { items: [{ kind: 'typed', note: 'new' }, { kind: 'b' }] } }
+
+        type('dataKind.items[0].kind', 'typed')
+        fireEvent.focus(expandedNote())
+        fireEvent.change(expandedNote(), { target: { value: 'new' } })
+        fireEvent.blur(expandedNote())
+        type('dataKind.items[1].kind', 'b')
+        await click('Add')
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('typed')
+        expect(expandedNote()).toHaveValue('new')
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+})
+
+// A `useForm` block whose `name` or `data` selects no values holds the whole document, as the document's own form does
+// (`wholeDocument`), and the merges take from each the fields it changed (`mergeDocuments`). An Add and a Remove in a
+// table beside it write the rows' edits into the document's form all the same, and move the start of each row they keep
+// written to what that form held of it once written.
+describe.each(rowsOfBothKinds)('an Add and a Remove beside a `useForm` block that holds the whole document, in a table whose cells %s', (_, useForm) => {
+    const meta = {
+        view: 'Col',
+        items: [
+            { view: 'Data', kind: 'block', useForm: true, meta: { view: 'Col', items: [{ view: 'Input', name: 'title', type: 'text' }] } },
+            {
+                view: 'Table',
+                name: 'dataKind.items',
+                headers: [{ id: 'kind', label: 'Kind' }, { id: 'null', label: '' }],
+                renderItemCells: {
+                    view: 'Data', kind: 'items', embedded: true, ...useForm && { useForm: true },
+                    meta: {
+                        view: 'TableCells',
+                        items: [
+                            { view: 'Input', name: 'kind', type: 'text' },
+                            { view: 'Button', children: 'Remove', onClick: 'removeData' },
+                        ],
+                    },
+                },
+                renderExtraItem: {
+                    view: 'Data', kind: 'items', embedded: true, initialValues: {},
+                    meta: {
+                        view: 'TableCells',
+                        items: [
+                            { view: 'Input', name: 'kind', type: 'text', label: 'New kind' },
+                            { view: 'Button', children: 'Add', onClick: 'addData' },
+                        ],
+                    },
+                },
+            },
+            { view: 'Button', children: 'Submit', onClick: 'submit' },
+        ],
+    }
+
+    it('keeps what was typed in a row as a row is added and another removed', async () => {
+        const { host } = mount(meta, { title: 'T', dataKind: { items: [{ kind: 'a' }, { kind: 'b' }] } })
+        const edited = { title: 'T', dataKind: { items: [{ kind: 'b-edited' }, { kind: 'c' }] } }
+
+        type('dataKind.items[1].kind', 'b-edited')
+        type('dataKind.items[2].kind', 'c')
+        await click('Add')
+        await click('Remove', 0)
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('b-edited')
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+
+    it('keeps an edit to the row it was made in, as a row that reads the same moves into its place', async () => {
+        const { host } = mount(meta, { title: 'T', dataKind: { items: [{ kind: 'x' }, { kind: 'a' }, { kind: 'a' }] } })
+        const edited = { title: 'T', dataKind: { items: [{ kind: 'a1' }, { kind: 'a' }] } }
+
+        type('dataKind.items[1].kind', 'a1')
+        await click('Remove', 0)
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('a1')
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+})
+
+// A row an Add or a Remove leaves where it was, and as it was, goes back into the data they rebuild as its form started
+// from it, so that its form keeps what it holds (`dataKindPush.ts`), as it did before the edits were written. Written
+// into that data with the other rows' edits, its edit started its form again from it. Measured while this was made: the
+// row was no longer dirty, and an error a field of it showed was gone from the field and from what the host was told,
+// until the field was touched again.
+describe('a `useForm` row an Add or a Remove leaves where it was and as it was', () => {
+    const meta = {
+        view: 'Table',
+        name: 'dataKind.items',
+        headers: [{ id: 'kind', label: 'Kind' }, { id: 'null', label: '' }],
+        renderItemCells: {
+            view: 'Data', kind: 'items', embedded: true, useForm: true,
+            meta: {
+                view: 'TableCells',
+                items: [
+                    { view: 'Input', name: 'kind', type: 'text', validate: 'required', required: true },
+                    { view: 'Button', children: 'Remove', onClick: 'removeData' },
+                ],
+            },
+        },
+        renderExtraItem: {
+            view: 'Data', kind: 'items', embedded: true, initialValues: {},
+            meta: {
+                view: 'TableCells',
+                items: [
+                    { view: 'Input', name: 'kind', type: 'text', label: 'New kind' },
+                    { view: 'Button', children: 'Add', onClick: 'addData' },
+                ],
+            },
+        },
+    }
+    /** The form of the row that holds the field `name`. */
+    const formOf = name => {
+        let holder
+        formsStorage.forEach(({ form }) => { if (form.getFieldState(name)) holder = form })
+        return holder
+    }
+
+    it('keeps its form through an Add: its edit, and the error a field of it shows and the host is told of', async () => {
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'a' }, { kind: 'x' }] } }, { hearErrors: true })
+        type('dataKind.items[0].kind', 'typed')
+        type('dataKind.items[1].kind', '')
+        await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)) })
+        expect(shown('dataKind.items[1].kind')).toBe('Required')
+        expect(host.errors[host.errors.length - 1]).toEqual(['dataKind.items[1].kind'])
+
+        type('dataKind.items[2].kind', 'b')
+        await click('Add')
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('typed')
+        expect(formOf('dataKind.items[0].kind').getState().pristine).toBe(false)
+        expect(shown('dataKind.items[1].kind')).toBe('Required')
+        expect(host.errors[host.errors.length - 1]).toEqual(['dataKind.items[1].kind'])
+        expect(field('dataKind.items[2].kind')).toHaveValue('b')
+        // The data holds the row as it started, so its form gives its edit, from what it started with.
+        expect(host.reader().dataKind.items[0]).toEqual({ kind: 'typed' })
+        type('dataKind.items[0].kind', 'a')
+        expect(host.reader().dataKind.items[0]).toEqual({ kind: 'a' })
+    })
+
+    it('keeps its form through a Remove of a row after it', async () => {
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'a' }, { kind: 'b' }, { kind: 'c' }] } })
+        type('dataKind.items[0].kind', 'a-edited')
+
+        await click('Remove', 2)
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('a-edited')
+        expect(formOf('dataKind.items[0].kind').getState().pristine).toBe(false)
+        expect(host.reader()).toEqual({ dataKind: { items: [{ kind: 'a-edited' }, { kind: 'b' }] } })
+    })
+})
+
+// A row whose form starts from the whole document, not from its row (`engine/Data.tsx`): a `null` row, for which the
+// `Data` view is handed the document, and a row whose cells read the document (`relativeData: false`). An Add or a Remove
+// changes the document, so such a form starts again from the data they rebuild, whatever they did to its row: its values
+// must be in that data. Found in review: put back, an outer row took a `null` line's value out of it, and a row of the
+// second kind went back as it started.
+describe('a `useForm` row whose form starts from the whole document', () => {
+    it('keeps what was typed in an empty line, in a row put back as it was, as a line is added below another row', async () => {
+        const { host } = mount(phasesWithLines(true, true), {
+            dataKind: {
+                phases: [
+                    { title: 'Design', dataKind: { lineItems: [{ sku: 'D-1' }, null] } },
+                    { title: 'Build', dataKind: { lineItems: [] } },
+                ],
+            },
+        })
+
+        type('dataKind.phases[0].title', 'Design 2')
+        type('dataKind.phases.0.dataKind.lineItems[1].sku', 'D-2')
+        type('dataKind.phases.1.dataKind.lineItems[0].sku', 'B-1')
+        await click('Add line', 1)
+
+        expect(field('dataKind.phases[0].title')).toHaveValue('Design 2')
+        expect(field('dataKind.phases.0.dataKind.lineItems[1].sku')).toHaveValue('D-2')
+        expect(host.reader()).toEqual({
+            dataKind: {
+                phases: [
+                    { title: 'Design 2', dataKind: { lineItems: [{ sku: 'D-1' }, { sku: 'D-2' }] } },
+                    { title: 'Build', dataKind: { lineItems: [{ sku: 'B-1' }] } },
+                ],
+            },
+        })
+    })
+
+    it('keeps what was typed in a row whose cells read the document, as a row is added', async () => {
+        const meta = {
+            view: 'Table',
+            name: 'dataKind.items',
+            headers: [{ id: 'kind', label: 'Kind' }, { id: 'null', label: '' }],
+            renderItemCells: {
+                view: 'Data', kind: 'items', embedded: true, useForm: true, relativeData: false,
+                meta: { view: 'TableCells', items: [{ view: 'Input', name: 'kind', type: 'text' }] },
+            },
+            renderExtraItem: {
+                view: 'Data', kind: 'items', embedded: true, initialValues: {},
+                meta: {
+                    view: 'TableCells',
+                    items: [
+                        { view: 'Input', name: 'kind', type: 'text', label: 'New kind' },
+                        { view: 'Button', children: 'Add', onClick: 'addData' },
+                    ],
+                },
+            },
+        }
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'a' }, { kind: 'b' }] } })
+
+        type('dataKind.items[0].kind', 'typed')
+        type('dataKind.items[2].kind', 'c')
+        await click('Add')
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('typed')
+        expect(host.reader()).toEqual({ dataKind: { items: [{ kind: 'typed' }, { kind: 'b' }, { kind: 'c' }] } })
     })
 })

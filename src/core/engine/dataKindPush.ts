@@ -2,6 +2,9 @@ import { get } from '../utils'
 import { cloneDeep, set } from '../utils/object'
 import { phraseMessage } from '../utils/phrases'
 import type { PhraseMessage } from '../utils/phrases'
+import { dataFormsOf } from '../state/formRegistry'
+import { changedRowsFor, settleWrittenRows } from './formData'
+import type { ChangedRow, WrittenForm } from './formData'
 
 /** A row, or a tree of rows, as final-form holds them. */
 type Values = Record<string, unknown>
@@ -10,6 +13,8 @@ type Values = Record<string, unknown>
 export type DataKindForm = {
     getState: () => { values?: unknown }
     reset: (values?: unknown) => void
+    change: (name: string, value: unknown) => void
+    batch: (changes: () => void) => void
     mutators?: {
         push?: (path: string, value: unknown) => void
         remove?: (path: string, index: number) => unknown
@@ -20,6 +25,8 @@ export type DataKindForm = {
 export type DataKindParent = {
     props?: { instance?: { form?: DataKindForm } }
     setState?: (update: (prev: { data?: object }) => object, callback?: () => void) => void
+    /** Its document tree, whose table rows with a form of their own have their edits kept (`keepRowEdits`) */
+    formTree?: object
 }
 
 /** A `Data` block's meta, as far as its rows are located. */
@@ -201,6 +208,26 @@ export function dataKindPathFor (meta: DataKindMeta, kind: string | undefined, f
 }
 
 /**
+ * Writes the rows whose own forms hold what the parent form does not into the parent form, as `changedRowsFor` gives
+ * them, before a row is added to it or removed from it (2026-10-27). An Add and a Remove rebuild the document's data
+ * from that form's values, which held none of what such a row's fields hold, and a row whose data that changed started
+ * again from it (`WithForm`), what was typed in its cells gone: a row whose expanded table gained or lost a line, or
+ * whose expanded content had an edit, and the rows after a removed one, which move up a row. Written while each row is
+ * at the place its form has it, so a removal moves an edit with its row. In one batch: the form's listeners hear once.
+ * Once the row is added or removed, `settleWrittenRows` puts back what that left as it was.
+ *
+ * @param {Object} parentForm - the form the row is added to or removed from
+ * @param {Map} forms - the forms of its document tree, `dataFormsOf` it; none, nothing is written
+ * @returns {Object} the rows written, and the form with its values once they were, for `settleWrittenRows`
+ */
+function keepRowEdits (parentForm: DataKindForm, forms: ReturnType<typeof dataFormsOf>): { rows: ChangedRow[], written: WrittenForm } {
+    const rows = changedRowsFor(parentForm, forms)
+    if (rows.length) parentForm.batch(() => rows.forEach(({ place, row }) => parentForm.change(place, row)))
+    // A cast, not a guard: the form's values are an object, which the caller has checked.
+    return { rows, written: { form: parentForm, values: parentForm.getState().values as Values } }
+}
+
+/**
  * Append one plain row object via the parent final-form array mutator, then sync `instance.state.data.json`
  * from form values (same pattern as REMOVE_DATA). Do not also splice `data.json` manually — when that array
  * shares a reference with `form.values`, manual spread + `mutators.push` can duplicate the new row.
@@ -251,8 +278,11 @@ export function pushDataKindRow ({ parentUIRender, meta, kind, rowObject, fallba
         console.warn(`ADD_DATA: dataKind not found at "${dataKindPath}" (kind="${kind}", relativePath="${rel}")`)
         return false
     }
+    const forms = dataFormsOf(parentUIRender.formTree)
+    const { rows, written } = keepRowEdits(parentForm, forms)
     parentForm.mutators.push(arrayPath, rowObject)
     const nextJson = cloneDeep(parentForm.getState().values)
+    settleWrittenRows(nextJson, rows, written, forms)
     parentUIRender.setState(
         (prev) => ({
             data: {
@@ -298,7 +328,7 @@ export function pushDataKindRow ({ parentUIRender, meta, kind, rowObject, fallba
  */
 /** What `removeDataKindRow` is given: see the parameters above. */
 export type RemoveDataKindRowArgs = {
-    parentUIRender: Required<Pick<DataKindParent, 'setState'>>
+    parentUIRender: Required<Pick<DataKindParent, 'setState'>> & Pick<DataKindParent, 'formTree'>
     parentForm?: DataKindForm | null
     meta?: DataKindMeta
     kind: string
@@ -312,8 +342,11 @@ export function removeDataKindRow ({ parentUIRender, parentForm, meta, kind, ind
         console.warn('REMOVE_DATA: parent form or mutators.remove is not available')
         return false
     }
+    const forms = dataFormsOf(parentUIRender.formTree)
+    const { rows, written } = keepRowEdits(parentForm, forms)
     parentForm.mutators.remove(arrayPath, Number(index))
     const nextJson = compactDataKindArrays(cloneDeep(parentForm.getState().values))
+    settleWrittenRows(nextJson, rows, written, forms)
     parentUIRender.setState((prev) => ({
         data: {
             ...prev.data,

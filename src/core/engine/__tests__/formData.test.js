@@ -1,12 +1,15 @@
 import {
     changeOptionOrderForSelectFields,
+    changedRowsFor,
     getFormsData,
     getRawFormsData,
     getLiveMergedDataKindArray,
     holdsFields,
     restartWrittenRows,
     rowPlaceOf,
+    settleWrittenRows,
 } from '../formData'
+import { cloneDeep } from '../../utils'
 
 /**
  * A form as the merge reads it: its values, the fields it registers and the values it started with, which a table
@@ -501,6 +504,194 @@ describe('restartWrittenRows', () => {
         restartWrittenRows(formsOf(row, { items: [{ a: 'typed' }] }))
 
         expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ a: 'the document\'s' }])
+    })
+})
+
+describe('changedRowsFor', () => {
+    // A table row with a form of its own, which starts from the row at its place (`engine/Data.tsx`), and its fields.
+    const rowForm = (values, relativePath, relativeIndex, fields, initialValues) => ({
+        form: { getState: () => ({ values, initialValues }), getRegisteredFields: () => fields },
+        meta: { relativePath, relativeIndex },
+    })
+
+    it('gives each row whose form changed a field, as the document\'s form holds it with those fields written', () => {
+        const document = makeForm({ title: 'T', items: [{ kind: 'a', note: 'new', when: '2020-01-01' }, { kind: 'b' }] })
+        const forms = new Map([
+            ['first', rowForm({ items: [{ kind: 'typed', note: 'old' }] }, 'items', 0, ['items[0].kind', 'items[0].when', 'items[0].note'], { items: [{ kind: 'a', note: 'old', when: '2020-01-01' }] })],
+            ['second', rowForm({ items: [undefined, { kind: 'b' }] }, 'items', 1, ['items[1].kind'], { items: [undefined, { kind: 'b' }] })],
+            ['document', { form: document, meta: {} }],
+        ])
+
+        expect(changedRowsFor(document, forms)).toEqual([{ place: 'items[0]', row: { kind: 'typed', note: 'new' }, initial: undefined }])
+        expect(document.getState().values.items[0]).toEqual({ kind: 'a', note: 'new', when: '2020-01-01' })
+    })
+
+    it('leaves out a row its array does not hold, a row with no field in it, and the form the rows are for', () => {
+        const document = rowForm({ items: [{ kind: 'edited' }] }, 'items', 0, ['items[0].kind'], { items: [{ kind: 'a' }] })
+        const forms = new Map([
+            ['past the end', rowForm({ items: [undefined, { kind: 'typed' }] }, 'items', 1, ['items[1].kind'])],
+            ['elsewhere', rowForm({ others: [{ kind: 'typed' }] }, 'others', 0, ['others[0].kind'])],
+            ['no field in it', rowForm({ items: [{ kind: 'typed' }], kind: 'typed' }, 'items', 0, ['kind'])],
+            ['the document', document],
+        ])
+
+        expect(changedRowsFor(document.form, forms)).toEqual([])
+    })
+
+    it('leaves out a row whose edits the form holds already, as a submit leaves them in the document\'s form', () => {
+        const document = makeForm({ items: [{ kind: 'typed' }] })
+        const forms = new Map([
+            ['row', rowForm({ items: [{ kind: 'typed' }] }, 'items', 0, ['items[0].kind'], { items: [{ kind: 'a' }] })],
+            ['document', { form: document, meta: {} }],
+        ])
+
+        expect(changedRowsFor(document, forms)).toEqual([])
+    })
+
+    it('leaves out a row where the form\'s array has a hole, as a row\'s own form has before its row', () => {
+        const items = []
+        items[1] = { kind: 'b' }
+        const row = rowForm({ items }, 'items', 1, ['items[1].kind'])
+        const forms = new Map([['before it', rowForm({ items: [{ kind: 'typed' }] }, 'items', 0, ['items[0].kind'])], ['the row', row]])
+
+        expect(changedRowsFor(row.form, forms)).toEqual([])
+    })
+
+    it('leaves out a row whose place has another shape in the form, which final-form throws for', () => {
+        const document = makeForm({ orders: { 1: { lines: [{ sku: 'A' }] } } })
+        const forms = new Map([
+            ['line', rowForm({ orders: { 1: { lines: [{ sku: 'B' }] } } }, 'orders.1.lines', 0, ['orders.1.lines[0].sku'])],
+            ['document', { form: document, meta: {} }],
+        ])
+
+        expect(changedRowsFor(document, forms)).toEqual([])
+    })
+
+    it('gives the row a row\'s form started from, where that form holds just it, an object, and the form holds it just so', () => {
+        const started = { kind: 'a' }
+        const values = { items: [{ kind: 'a' }, null, { kind: 'c', note: 'new' }, { kind: 'd' }] }
+        const document = makeForm(values)
+        const forms = new Map([
+            ['as it started', rowForm({ items: [{ kind: 'typed' }] }, 'items', 0, ['items[0].kind'], { items: [started] })],
+            ['empty', rowForm({ items: [undefined, { kind: 'typed' }] }, 'items', 1, ['items[1].kind'], { items: [undefined, null] })],
+            ['edited below', rowForm({ items: [undefined, undefined, { kind: 'typed' }] }, 'items', 2, ['items[2].kind'], { items: [undefined, undefined, { kind: 'c' }] })],
+            // A form that starts from the whole document, as a row whose cells read the document does.
+            ['the whole document', rowForm({ ...values, items: [...values.items.slice(0, 3), { kind: 'typed' }] }, 'items', 3, ['items[3].kind'], values)],
+            ['document', { form: document, meta: {} }],
+        ])
+
+        expect(changedRowsFor(document, forms).map(({ initial }) => initial)).toEqual([started, undefined, undefined, undefined])
+    })
+
+    it('gives no `initial` for a row with a row given inside it that has none, whose value it would take away', () => {
+        const values = { project: 'P', phases: [{ title: 'Design', lines: [{ sku: 'A' }, null] }] }
+        const phase = rowForm({ phases: [{ title: 'Design 2', lines: [{ sku: 'A' }, null] }] }, 'phases', 0, ['phases[0].title'], { phases: [values.phases[0]] })
+        const line = initialValues => rowForm({ phases: [{ lines: [undefined, { sku: 'B' }] }] }, 'phases.0.lines', 1, ['phases.0.lines[1].sku'], initialValues)
+        const initialsOf = (lineStartsFrom, documentValues) => changedRowsFor(makeForm(documentValues), new Map([
+            ['phase', phase], ['line', line(lineStartsFrom)], ['document', { form: makeForm(documentValues), meta: {} }],
+        ])).map(({ initial }) => initial)
+
+        // A `null` line: its form starts from the whole document.
+        expect(initialsOf(values, values)).toEqual([undefined, undefined])
+        // A line whose form starts from its row: the phase goes back, and takes it along.
+        const withLine = { ...values, phases: [{ title: 'Design', lines: [{ sku: 'A' }, { sku: 'B0' }] }] }
+        const phaseOf = rowForm(phase.form.getState().values, 'phases', 0, ['phases[0].title'], { phases: [withLine.phases[0]] })
+        expect(changedRowsFor(makeForm(withLine), new Map([
+            ['phase', phaseOf], ['line', line({ phases: [{ lines: [undefined, { sku: 'B0' }] }] })], ['document', { form: makeForm(withLine), meta: {} }],
+        ])).map(({ initial }) => initial)).toEqual([withLine.phases[0], { sku: 'B0' }])
+    })
+
+    it.each([['inner', ['line', 'phase']], ['outer', ['phase', 'line']]])('gives a row inside another after it, in it, the %s one registered first', (_, order) => {
+        const document = makeForm({ phases: [{ title: 'Design', lines: [{ sku: 'A' }, { sku: 'B' }] }] })
+        const rows = {
+            phase: rowForm({ phases: [{ title: 'Design 2', lines: [{ sku: 'A' }, { sku: 'B' }] }] }, 'phases', 0, ['phases[0].title']),
+            line: rowForm({ phases: [{ lines: [undefined, { sku: 'B2' }] }] }, 'phases.0.lines', 1, ['phases.0.lines[1].sku']),
+        }
+        const forms = new Map([...order.map(name => [name, rows[name]]), ['document', { form: document, meta: {} }]])
+
+        expect(changedRowsFor(document, forms).map(({ place, row }) => [place, row])).toEqual([
+            ['phases[0]', { title: 'Design 2', lines: [{ sku: 'A' }, { sku: 'B2' }] }],
+            ['phases.0.lines[1]', { sku: 'B2' }],
+        ])
+    })
+})
+
+
+describe('settleWrittenRows', () => {
+    // A table row with a form of its own, which starts from the row at its place (`engine/Data.tsx`), and its fields.
+    const rowForm = (values, relativePath, relativeIndex, fields, initialValues) => ({
+        form: { getState: () => ({ values, initialValues }), getRegisteredFields: () => fields },
+        meta: { relativePath, relativeIndex },
+    })
+    /**
+     * Settles `rows` after an Add or a Remove: the document's form holds `json`, the data it rebuilt, and held `written`
+     * once the rows were written into it. Gives what the forms read as then.
+     */
+    const settle = (json, rows, written, rowForms) => {
+        const document = makeForm(json)
+        const forms = new Map([...Object.entries(rowForms), ['document', { form: document, meta: {} }]])
+        settleWrittenRows(json, rows, { form: document, values: written }, forms)
+        return getFormsData(forms)
+    }
+
+    it('puts back a row the operation left where it was and as it was, whose form then gives its edit', () => {
+        const started = { kind: 'a' }
+        const row = rowForm({ items: [{ kind: 'typed' }] }, 'items', 0, ['items[0].kind'], { items: [started] })
+        const json = { items: [{ kind: 'typed' }, { kind: 'b' }] }
+
+        const read = settle(json, [{ place: 'items[0]', row: { kind: 'typed' }, initial: started }], { items: [{ kind: 'typed' }] }, { row })
+
+        expect(json).toEqual({ items: [{ kind: 'a' }, { kind: 'b' }] })
+        expect(read).toEqual({ items: [{ kind: 'typed' }, { kind: 'b' }] })
+    })
+
+    it('leaves a row the operation moved, and measures its form\'s changes from what was written, where it was', () => {
+        // Rows `x`, `a`, `a`, the second edited to `a1`, the first removed: the third, which reads as the second did,
+        // comes to the second's place, and its form is not started again.
+        const row = rowForm({ items: [undefined, { kind: 'a1' }] }, 'items', 1, ['items[1].kind'], { items: [undefined, { kind: 'a' }] })
+        const json = { items: [{ kind: 'a1' }, { kind: 'a' }] }
+
+        const read = settle(json, [{ place: 'items[1]', row: { kind: 'a1' }, initial: { kind: 'a' } }], { items: [{ kind: 'x' }, { kind: 'a1' }, { kind: 'a' }] }, { row })
+
+        expect(json).toEqual({ items: [{ kind: 'a1' }, { kind: 'a' }] })
+        expect(read).toEqual({ items: [{ kind: 'a1' }, { kind: 'a' }] })
+    })
+
+    it('reads another form that holds the document from its root as it is, and moves no start of a row not written', () => {
+        const moved = rowForm({ items: [undefined, { kind: 'a1' }] }, 'items', 1, ['items[1].kind'], { items: [undefined, { kind: 'a' }] })
+        // Edited, and not written: its edit is what the data holds there.
+        const notWritten = rowForm({ items: [{ kind: 'a1' }] }, 'items', 0, ['items[0].kind'], { items: [{ kind: 'x' }] })
+        const json = { items: [{ kind: 'a1' }, { kind: 'a' }] }
+        const document = makeForm(json)
+        const forms = new Map([
+            ['moved', moved], ['not written', notWritten], ['document', { form: document, meta: {} }],
+            // A block's form of its own at the document's root, and one in a row, which holds no document.
+            ['block', { form: makeForm({ title: 'T' }) }], ['in a row', { form: makeForm({ note: 'n' }), meta: { relativePath: 'items.0' } }],
+        ])
+
+        settleWrittenRows(json, [{ place: 'items[1]', row: { kind: 'a1' }, initial: { kind: 'a' } }],
+            { form: document, values: { items: [{ kind: 'x' }, { kind: 'a1' }, { kind: 'a' }] } }, forms)
+
+        forms.delete('in a row')
+        expect(getFormsData(forms)).toEqual({ title: 'T', items: [{ kind: 'a1' }, { kind: 'a' }] })
+    })
+
+    it('puts back a row with the rows inside it, whose forms keep what they measure their changes from', () => {
+        const phase = rowForm({ phases: [{ title: 'D2', lines: [{ sku: 'A' }, { sku: 'B' }] }] }, 'phases', 0, ['phases[0].title'],
+            { phases: [{ title: 'D', lines: [{ sku: 'A' }, { sku: 'B' }] }] })
+        const line = rowForm({ phases: [{ lines: [undefined, { sku: 'B2' }] }] }, 'phases.0.lines', 1, ['phases.0.lines[1].sku'],
+            { phases: [{ lines: [undefined, { sku: 'B' }] }] })
+        const written = { phases: [{ title: 'D2', lines: [{ sku: 'A' }, { sku: 'B2' }] }] }
+        const json = { ...cloneDeep(written), others: [{ kind: 'new' }] }
+        const rows = [
+            { place: 'phases[0]', row: written.phases[0], initial: { title: 'D', lines: [{ sku: 'A' }, { sku: 'B' }] } },
+            { place: 'phases.0.lines[1]', row: written.phases[0].lines[1], initial: { sku: 'B' } },
+        ]
+
+        const read = settle(json, rows, written, { phase, line })
+
+        expect(json.phases).toEqual([{ title: 'D', lines: [{ sku: 'A' }, { sku: 'B' }] }])
+        expect(read.phases).toEqual(written.phases)
     })
 })
 

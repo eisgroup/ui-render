@@ -149,7 +149,12 @@ what the forms holding the document from its root hold of its values after a sub
 `submit` action calls as it writes; a submit a row's own document makes writes into the row's form, and moves no
 start). The rest of the row, a field its cells only show included, is what the document's form holds: what another
 form, such as the row's expanded content's, has edited there, and what a submit has written of the row's form. A
-new write of a row's values into the document's form must move the start the same way. Its fields are every one it
+new write of a row's values into the document's form must move the start the same way. An Add and a Remove write the
+fields such rows changed into the document's form before they add or remove a row (`keepRowEdits`,
+`engine/dataKindPush.ts`): a row whose data that changes starts again from it with its edits, and a row they leave where
+it was, and as it was, goes back into the data as its form started from it, so its form keeps its start and what it
+holds (`settleWrittenRows`); the start of every other row written moves, to what the document's form held of it once
+written, where the row still was. Its fields are every one it
 has registered, the ones a `showIf` hid included (`fieldNamesOf` in `createBatchedForm`). A name that comes is no
 change of what the forms hold: the kept merge is checked against the values of the names that came
 (`fieldNamesCount`, `holdsFields`), so a burst of registrations, a mount's among them, merges nothing more. Where more
