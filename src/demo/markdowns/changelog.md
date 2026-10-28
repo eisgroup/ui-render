@@ -1,6 +1,11 @@
 ### Table of Contents
 
-### Unreleased
+### v0.35.1
+
+This patch fixes the forms `useForm` gives to table rows and to blocks that hold the whole document. Such a row
+starts with its values, a submit sends its edits, and an Add or a Remove keeps them. An edit in such a block is in
+what the document reads. A `showIf` that reads the form also merges the document's forms once, not once per node. A
+host on 0.35.0 has nothing to change: the public types, the peer range and the bundled packages are as they were.
 
 #### Fixes
 
