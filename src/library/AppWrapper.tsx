@@ -28,7 +28,7 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
     const appWithRoot = React.useMemo(() => ({ ...app, popupRoot }), [app, popupRoot])
 
     return (
-        <div data-version="0.35.0" className={"ui-render"}>
+        <div data-version="0.35.1" className={"ui-render"}>
             <AppContext.Provider value={appWithRoot}>
                 <View className={`app fade-in lang--${language} ${currency}`}>
                     <Row fill className="max-size">
